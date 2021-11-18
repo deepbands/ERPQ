@@ -27,7 +27,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="edtParams"/>
+         <widget class="QLineEdit" name="edtParams">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnParams">
@@ -96,7 +100,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTableView" name="tabLabel"/>
+         <widget class="QTableWidget" name="tabLabel"/>
         </item>
        </layout>
       </item>
