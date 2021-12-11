@@ -24,6 +24,8 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFileDialog
+from qgis.core import QgsProcessingFeedback
+from qgis.utils import iface
 # TODO : add scikit-image to req
 try:
     import qgis.PyQt.QtGui as QtGui
@@ -238,9 +240,9 @@ class ERPQ:
         del self.toolbar
 
     def loadParams(self):
-        filters = self.tr("Paddle静态模型权重文件(*.pdiparams)")
+        filters = self.tr("Paddle static model weight file(*.pdiparams)")
         param_path, _ = QFileDialog.getOpenFileName(
-            self.dockwidget, self.tr("选择模型参数"), "", filters)
+            self.dockwidget, self.tr("Choose model parameters"), "", filters)
         success, res = self.controller.setModel(param_path, False)
         if success:
             self.dockwidget.edtParams.setText(param_path.split("/")[-1].split(".")[0])
@@ -307,8 +309,8 @@ class ERPQ:
         if len(self.controller.labelList) == 0:
             return True
         res = self.warn(
-            self.tr("清空标签列表?"),
-            self.tr("请确认是否要清空标签列表"),
+            self.tr("Clear the label list?"),
+            self.tr("Please confirm whether you want to clear the label list"),
             QMessageBox.Yes | QMessageBox.Cancel,
         )
         if res == QMessageBox.Cancel:

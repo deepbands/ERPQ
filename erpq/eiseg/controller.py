@@ -22,6 +22,8 @@ import cv2
 import numpy as np
 from skimage.measure import label
 import paddle
+from qgis.core import (QgsProcessingFeedback, Qgis)
+from qgis.utils import iface
 
 from .inference import clicker
 from .inference.predictor import get_predictor
@@ -101,7 +103,8 @@ class InteractiveController:
         if param_path is not None:
             model_path = param_path.replace(".pdiparams", ".pdmodel")
             if not osp.exists(model_path):
-                raise Exception(f"Not present {model_path} Locate the model file")
+                iface.messageBar().pushMessage(f"{model_path} Not found, Please Locate the model file", level=Qgis.Critical, duration=5)
+                # raise Exception(f"Not present {model_path} Locate the model file")
             if use_gpu is None:
                 if paddle.device.is_compiled_with_cuda():  # TODO: Can use GPU but returns False
                     use_gpu = True

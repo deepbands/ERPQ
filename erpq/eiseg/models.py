@@ -16,6 +16,8 @@
 import os.path as osp
 from abc import abstractmethod
 import paddle.inference as paddle_infer
+from qgis.core import (QgsProcessingFeedback, Qgis)
+from qgis.utils import iface
 
 here = osp.dirname(osp.abspath(__file__))
 
@@ -56,7 +58,9 @@ class EISegModel:
 
     def check_param(self, model_path, param_path):
         if model_path is None or not osp.exists(model_path):
-            raise Exception(f"Model path{model_path}does not exist. Please specify the correct model path")
+            iface.messageBar().pushMessage(f"{model_path} Not found, Please Locate the model file", level=Qgis.Critical, duration=5)
+            # raise Exception(f"Model path{model_path}does not exist. Please specify the correct model path")
         if param_path is None or not osp.exists(param_path):
-            raise Exception(f"Weighted path{param_path}does not exist. Please specify the correct weight path")
+            iface.messageBar().pushMessage(f"Weighted path{param_path} does not exist. Please specify the correct weight path", level=Qgis.Critical, duration=5)
+            # raise Exception(f"Weighted path{param_path}does not exist. Please specify the correct weight path")
         return model_path, param_path
