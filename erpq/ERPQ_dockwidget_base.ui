@@ -22,7 +22,7 @@
         <item>
          <widget class="QLabel" name="labParams">
           <property name="text">
-           <string>模型参数选择</string>
+           <string>Model Parameter Selection</string>
           </property>
          </widget>
         </item>
@@ -61,7 +61,7 @@
           <item>
            <widget class="QLabel" name="labLabel">
             <property name="text">
-             <string>标签列表</string>
+             <string>Label List</string>
             </property>
            </widget>
           </item>
@@ -111,7 +111,7 @@
           <item>
            <widget class="QLabel" name="labThresholdName">
             <property name="text">
-             <string>分割阈值：</string>
+             <string>Segmentation Threshold:</string>
             </property>
            </widget>
           </item>
