@@ -1,0 +1,4 @@
+scikit-image
+opencv-python
+paddlepaddle>=2.2.0
+paddleseg

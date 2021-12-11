@@ -37,14 +37,14 @@ class InteractiveController:
         predictor_params: dict = None,
         prob_thresh: float = 0.5,
     ):
-        """初始化控制器.
+        """Initialize the controller.
 
         Parameters
         ----------
         predictor_params : dict
-            推理器配置
+            Reasoner configuration
         prob_thresh : float
-            区分前景和背景结果的阈值
+            Threshold to distinguish between foreground and background results
 
         """
         self.predictor_params = predictor_params
@@ -69,59 +69,59 @@ class InteractiveController:
         self.log = logging.getLogger(__name__)
 
     def filterLargestCC(self, do_filter: bool):
-        """设置是否只保留推理结果中的最大联通块
+        """Set whether to keep only the largest connected block in the inference result
 
         Parameters
         ----------
         do_filter : bool
-            是否只保存推理结果中的最大联通块
+            Whether to save only the largest connected block in the inference result
         """
         if not isinstance(do_filter, bool):
             return
         self.lccFilter = do_filter
 
     def setModel(self, param_path=None, use_gpu=None):
-        """设置推理其模型.
+        """Set up its model for inference.
 
         Parameters
         ----------
         params_path : str
-            模型路径
+            Model path
 
         use_gpu : bool
-            None:检测，根据paddle版本判断
-            bool:按照指定是否开启GPU
+            None:Check, according to paddle version
+            bool:Whether to turn on the GPU according to the specified
 
         Returns
         -------
         bool, str
-            是否成功设置模型, 失败原因
+            Whether to successfully set up the model, Reason for failure
 
         """
         if param_path is not None:
             model_path = param_path.replace(".pdiparams", ".pdmodel")
             if not osp.exists(model_path):
-                raise Exception(f"未在 {model_path} 找到模型文件")
+                raise Exception(f"Not present {model_path} Locate the model file")
             if use_gpu is None:
-                if paddle.device.is_compiled_with_cuda():  # TODO: 可以使用GPU却返回False
+                if paddle.device.is_compiled_with_cuda():  # TODO: Can use GPU but returns False
                     use_gpu = True
                 else:
                     use_gpu = False
             tic = time.time()
             try:
                 self.model = EISegModel(model_path, param_path, use_gpu)
-                self.reset_predictor()  # 即刻生效
+                self.reset_predictor()  # Effective immediately
             except KeyError as e:
                 return False, str(e)
-            return True, "模型设置成功"
+            return True, "The model is set successfully"
 
     def setImage(self, image: np.array):
-        """设置当前标注的图片
+        """Set the currently marked picture
 
         Parameters
         ----------
         image : np.array
-            当前标注的图片
+            The currently marked picture
 
         """
         if self.model is not None:
@@ -129,14 +129,14 @@ class InteractiveController:
             self._result_mask = np.zeros(image.shape[:2], dtype=np.uint8)
             self.resetLastObject()
 
-    # 标签操作
+    # Label operation
     def setLabelList(self, labelList: json):
-        """设置标签列表，会覆盖已有的标签列表
+        """Set the label list, it will overwrite the existing label list
 
         Parameters
         ----------
         labelList : json
-            标签列表格式为
+            The format of the tag list is
             {
                 {
                     "idx" : int         (like 0 or 1 or 2)
@@ -172,35 +172,35 @@ class InteractiveController:
     def exportLabel(self, path):
         self.labelList.exportLabel(path)
 
-    # 点击操作
+    # Click action
     def addClick(self, x: int, y: int, is_positive: bool):
-        """添加一个点并运行推理，保存历史用于undo
+        """Add a point and run inference, save history for undo
 
         Parameters
         ----------
         x : int
-            点击的横坐标
+            The abscissa of the click
         y : int
-            点击的纵坐标
+            The ordinate of the click
         is_positive : bool
-            是否点的是正点
+            Is it punctual?
 
         Returns
         -------
         bool, str
-            点击是否添加成功, 失败原因
+            Click whether to add successfully, Reason for failure
 
         """
 
-        # 1. 确定可以点
+        # 1. Sure you can click
         if not self.inImage(x, y):
-            return False, "点击越界"
+            return False, "Click out of bounds"
         if not self.modelSet:
-            return False, "未加载模型"
+            return False, "Model not loaded"
         if not self.imageSet:
-            return False, "图像未设置"
+            return False, "Image is not set"
 
-        if len(self.states) == 0:  # 保存一个空状态
+        if len(self.states) == 0:  # Save an empty state
             self.states.append(
                 {
                     "clicker": self.clicker.get_state(),
@@ -208,12 +208,12 @@ class InteractiveController:
                 }
             )
 
-        # 2. 添加点击，跑推理
+        # 2. Add click, run reasoning
         click = clicker.Click(is_positive=is_positive, coords=(y, x))
         self.clicker.add_click(click)
         pred = self.predictor.get_prediction(self.clicker)
 
-        # 3. 保存状态
+        # 3. Save state
         self.states.append(
             {
                 "clicker": self.clicker.get_state(),
@@ -225,16 +225,16 @@ class InteractiveController:
         else:
             self.probs_history.append((np.zeros_like(pred), pred))
 
-        # 点击之后就不能接着之前的历史redo了
+        # After clicking, you can't continue the previous history redo
         self.undo_states = []
         self.undo_probs_history = []
-        return True, "点击添加成功"
+        return True, "Click to add successfully"
 
     def undoClick(self):
         """
-        undo一步点击
+        undo一Step click
         """
-        if len(self.states) <= 1:  # == 1就只剩下一个空状态了，不用再退
+        if len(self.states) <= 1:  # == 1 there is only one empty state left, no need to return
             return
         self.undo_states.append(self.states.pop())
         self.clicker.set_state(self.states[-1]["clicker"])
@@ -245,9 +245,9 @@ class InteractiveController:
 
     def redoClick(self):
         """
-        redo一步点击
+        redo一Step click
         """
-        if len(self.undo_states) == 0:  # 如果还没撤销过
+        if len(self.undo_states) == 0:  # If it has not been revoked
             return
         if len(self.undo_probs_history) >= 1:
             next_state = self.undo_states.pop()
@@ -258,7 +258,7 @@ class InteractiveController:
 
     def finishObject(self):
         """
-        结束当前物体标注，准备标下一个
+        End the current object labeling and prepare to label the next one
         """
         object_prob = self.current_object_prob
         if object_prob is None:
@@ -273,7 +273,7 @@ class InteractiveController:
             self.polygons.append([self.curr_label_number, polygon])
         return object_mask, polygon
 
-    # 多边形
+    # Polygon
     def getPolygon(self):
         return self.polygon
 
@@ -296,9 +296,9 @@ class InteractiveController:
 
     def resetLastObject(self, update_image=True):
         """
-        重置控制器状态
+        Reset controller state
         Parameters
-            update_image(bool): 是否更新图像
+            update_image(bool): Whether to update the image
         """
         self.states = []
         self.probs_history = []
@@ -311,9 +311,9 @@ class InteractiveController:
 
     def reset_predictor(self, predictor_params=None):
         """
-        重置推理器，可以换推理配置
+        Reset the reasoner, you can change the reasoning configuration
         Parameters
-            predictor_params(dict): 推理配置
+            predictor_params(dict): Inference configuration
         """
         if predictor_params is not None:
             self.predictor_params = predictor_params
@@ -335,8 +335,8 @@ class InteractiveController:
     def get_visualization(self, alpha_blend: float, click_radius: int):
         if self.image is None:
             return None
-        # 1. 正在标注的mask
-        # results_mask_for_vis = self.result_mask  # 加入之前标完的mask
+        # 1. The mask being marked
+        # results_mask_for_vis = self.result_mask  # Add the previously marked mask
         results_mask_for_vis = np.zeros_like(self.result_mask)
         results_mask_for_vis *= self.curr_label_number
         if self.probs_history:
@@ -380,7 +380,7 @@ class InteractiveController:
     @property
     def current_object_prob(self):
         """
-        获取当前推理标签
+        Get the current inference label
         """
         if self.probs_history:
             _, current_prob_additive = self.probs_history[-1]
@@ -392,7 +392,7 @@ class InteractiveController:
     def is_incomplete_mask(self):
         """
         Returns
-            bool: 当前的物体是不是还没标完
+            bool: Is the current object still marked?
         """
         return len(self.probs_history) > 0
 

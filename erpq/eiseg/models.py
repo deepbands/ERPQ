@@ -27,10 +27,10 @@ class EISegModel:
         try:
             config = paddle_infer.Config(model_path, param_path)
         except:
-            ValueError(" 模型和参数不匹配，请检查模型和参数是否加载错误")
+            ValueError("The model and parameters do not match, please check whether the model and parameters are loaded incorrectly")
         if not use_gpu:
             config.enable_mkldnn()
-            # TODO: fluid要废弃了，研究判断方式
+            # TODO: fluid is going to be discarded, study the judgment method
             # if paddle.fluid.core.supports_bfloat16():
             #     config.enable_mkldnn_bfloat16()
             config.switch_ir_optim(True)
@@ -42,7 +42,7 @@ class EISegModel:
             config.delete_pass("conv_elementwise_add_fuse_pass")
             config.switch_ir_optim()
             config.enable_memory_optim()
-            # use_tensoret = False  # TODO: 目前Linux和windows下使用TensorRT报错
+            # use_tensoret = False  # TODO: Currently using TensorRT under Linux and Windows to report errors
             # if use_tensoret:
             #     config.enable_tensorrt_engine(
             #         workspace_size=1 << 30,
@@ -56,7 +56,7 @@ class EISegModel:
 
     def check_param(self, model_path, param_path):
         if model_path is None or not osp.exists(model_path):
-            raise Exception(f"模型路径{model_path}不存在。请指定正确的模型路径")
+            raise Exception(f"Model path{model_path}does not exist. Please specify the correct model path")
         if param_path is None or not osp.exists(param_path):
-            raise Exception(f"权重路径{param_path}不存在。请指定正确的权重路径")
+            raise Exception(f"Weighted path{param_path}does not exist. Please specify the correct weight path")
         return model_path, param_path
