@@ -1,5 +1,9 @@
 import os.path as osp
-import qtpy.QtGui as QtGui
+try:
+    import qgis.PyQt.QtGui as QtGui
+except:
+    import qtpy.QtGui as QtGui
+
 
 here = osp.dirname(osp.abspath(__file__))
 

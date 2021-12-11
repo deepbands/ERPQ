@@ -24,9 +24,15 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QFileDialog
-from qtpy.QtWidgets import QMessageBox, QTableWidgetItem
-import qtpy.QtGui as QtGui
-import qtpy.QtWidgets as QtWidgets
+# TODO : add scikit-image to req
+try:
+    import qgis.PyQt.QtGui as QtGui
+    import qgis.PyQt.QtWidgets as QtWidgets
+    from qgis.PyQt.QtWidgets import QMessageBox, QTableWidgetItem
+except:
+    import qtpy.QtGui as QtGui
+    import qtpy.QtWidgets as QtWidgets
+    from qtpy.QtWidgets import QMessageBox, QTableWidgetItem
 # Initialize Qt resources from file resources.py
 from .resources import *
 

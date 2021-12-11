@@ -1,3 +1,9 @@
 static_weights
 *.pdiparams
 *.pdmodel
+erpq/__pycache__/
+erpq/eiseg/__pycache__/
+erpq/eiseg/util/__pycache__/
+erpq/eiseg/inference/__pycache__/
+erpq/eiseg/inference/transforms/__pycache__/
+erpq/eiseg/inference/predictor/__pycache__/
